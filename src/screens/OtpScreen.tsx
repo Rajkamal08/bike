@@ -15,7 +15,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { useAuth } from '../contexts/AuthContext';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
@@ -36,7 +35,7 @@ const OtpScreen = () => {
   const navigation = useNavigation<OtpScreenNavigationProp>();
   const inputRefs = useRef<(TextInput | null)[]>(new Array(6).fill(null));
   const [error, setError] = useState<string | null>(null);
-  const [countdown, setCountdown] = useState(30);
+  const [countdown, setCountdown] = useState(60);
   const [canResend, setCanResend] = useState(false);
   const [resending, setResending] = useState(false);
   const { verifyOtp, sendOtp } = useAuth();
@@ -81,7 +80,7 @@ const OtpScreen = () => {
 
   const handleResendOtp = async () => {
     setCanResend(false);
-    setCountdown(30);
+    setCountdown(60);
     setResending(true);
     setError(null);
 
@@ -129,11 +128,19 @@ const OtpScreen = () => {
           contentContainerStyle={{ flexGrow: 1 }}
           keyboardShouldPersistTaps="handled"
         >
+          {/* Top Banner Image - Reduced Height and Mirroring Login Page */}
+          <View style={{ height: height * 0.22 }} className="w-full relative">
+            <Image
+              source={require('../../assets/images/Bike_rentals.jpg')}
+              className="w-full h-full"
+              resizeMode="cover"
+            />
+          </View>
 
           {/* Content Container */}
-          <View className="flex-1 px-8 pt-20 pb-10">
+          <View className="flex-1 px-8 pt-8 pb-10">
             {/* Logo Section */}
-            <View className="items-center mb-10">
+            <View className="items-center mb-8">
               <Image
                 source={require('../../assets/images/app_logo.png')}
                 style={{ width: width * 0.3, height: width * 0.3 * 0.6 }}
@@ -205,22 +212,16 @@ const OtpScreen = () => {
               )}
             </TouchableOpacity>
 
-            {/* Resend Logic - More Prominent */}
-            <View className="items-center mb-10 bg-gray-50/50 py-4 rounded-3xl border border-gray-100">
+            {/* Resend Logic */}
+            <View className="items-center mb-10">
               {canResend ? (
-                <View className="flex-row items-center">
-                  <Text className="text-gray-500 font-medium text-base mr-2">Didn't receive code?</Text>
-                  <TouchableOpacity onPress={handleResendOtp} disabled={resending}>
-                    <Text className="text-blue-600 font-black text-base underline uppercase tracking-wider">Resend OTP</Text>
-                  </TouchableOpacity>
-                </View>
+                <TouchableOpacity onPress={handleResendOtp} disabled={resending}>
+                  <Text className="text-blue-600 font-extrabold text-base">Resend OTP</Text>
+                </TouchableOpacity>
               ) : (
-                <View className="flex-row items-center">
-                  <Ionicons name="time-outline" size={18} color="#94a3b8" className="mr-2" />
-                  <Text className="text-gray-400 font-medium text-base">
-                    Resend code in <Text className="text-gray-900 font-black">{countdown}s</Text>
-                  </Text>
-                </View>
+                <Text className="text-gray-400 font-medium text-base">
+                  Resend code in <Text className="text-gray-900 font-bold">{countdown}s</Text>
+                </Text>
               )}
             </View>
 

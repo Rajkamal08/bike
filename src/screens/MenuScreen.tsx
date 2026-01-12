@@ -129,17 +129,17 @@ const MenuScreen = () => {
   return (
     <SafeAreaView className="flex-1 bg-white">
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-        {/* Premium Header - Ultra Compact */}
-        <View className="bg-yellow-400 rounded-b-[32px] px-6 pt-6 pb-8 shadow-xl shadow-yellow-200/50">
-          <View className="flex-row items-center justify-between mb-5">
-            <Text className="text-black text-xl font-black tracking-tighter uppercase">Menu</Text>
-            <TouchableOpacity onPress={() => navigation.goBack()} className="bg-white/30 p-1.5 rounded-full">
-              <X size={18} color="black" />
+        {/* Premium Header */}
+        <View className="bg-yellow-400 rounded-b-[40px] px-8 pt-10 pb-12 shadow-2xl shadow-yellow-200">
+          <View className="flex-row items-center justify-between mb-8">
+            <Text className="text-black text-2xl font-black tracking-tighter uppercase">Menu</Text>
+            <TouchableOpacity onPress={() => navigation.goBack()} className="bg-white/30 p-2 rounded-full">
+              <X size={24} color="black" />
             </TouchableOpacity>
           </View>
 
-          <View className="flex-row items-center gap-3">
-            <View className="w-14 h-14 rounded-2xl border-[3px] border-white flex items-center justify-center bg-white overflow-hidden shadow-xl">
+          <View className="flex-row items-center gap-5">
+            <View className="w-20 h-20 rounded-3xl border-4 border-white flex items-center justify-center bg-white overflow-hidden shadow-2xl">
               {user?.profileImage ? (
                 <Image
                   source={{ uri: getImageUrl(user.profileImage) }}
@@ -148,35 +148,35 @@ const MenuScreen = () => {
                 />
               ) : (
                 <View className="bg-gray-50 w-full h-full items-center justify-center">
-                  <UserIcon size={28} color="#cbd5e1" />
+                  <UserIcon size={40} color="#cbd5e1" />
                 </View>
               )}
             </View>
             <View className="flex-1">
-              <Text className="text-lg font-black text-black tracking-tight" numberOfLines={1}>
+              <Text className="text-2xl font-black text-black tracking-tight" numberOfLines={1}>
                 {user?.firstName || 'Welcome'} {user?.lastName || 'Rider'}
               </Text>
-              <View className="flex-row items-center mt-0">
-                <View className={`w-1.5 h-1.5 rounded-full mr-1.5 ${user?.firstName && user?.email ? 'bg-green-600' : 'bg-red-500'}`} />
-                <Text className="text-[12px] font-bold text-gray-800">
+              <View className="flex-row items-center mt-1">
+                <View className={`w-2 h-2 rounded-full mr-2 ${user?.firstName && user?.email ? 'bg-green-500' : 'bg-red-500'}`} />
+                <Text className="text-sm font-bold text-gray-800">
                   {user?.firstName && user?.email ? 'Verified Profile' : 'Incomplete Profile'}
                 </Text>
               </View>
             </View>
           </View>
 
-          <View className="flex-row gap-2.5 mt-5">
+          <View className="flex-row gap-3 mt-8">
             <TouchableScale
               onPress={handleViewProfile}
-              className="flex-1 bg-black py-3 rounded-xl items-center shadow-lg"
+              className="flex-1 bg-black py-4 rounded-2xl items-center shadow-xl"
             >
-              <Text className="text-white font-black uppercase text-[10px] tracking-widest">Edit Profile</Text>
+              <Text className="text-white font-black uppercase text-[12px] tracking-widest">Edit Profile</Text>
             </TouchableScale>
             <TouchableScale
               onPress={() => navigation.navigate(ROUTES.KYC_VERIFICATION)}
-              className="flex-1 bg-white py-3 rounded-xl items-center shadow-lg"
+              className="flex-1 bg-white py-4 rounded-2xl items-center shadow-xl"
             >
-              <Text className="text-black font-black uppercase text-[10px] tracking-widest">KYC Status</Text>
+              <Text className="text-black font-black uppercase text-[12px] tracking-widest">KYC Status</Text>
             </TouchableScale>
           </View>
         </View>

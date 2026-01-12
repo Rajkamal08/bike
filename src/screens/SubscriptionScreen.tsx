@@ -22,14 +22,12 @@ import {
   Wrench,
   Phone,
   X,
-  Tag,
 } from 'lucide-react-native';
 import Slider from '@react-native-community/slider';
 import { useWallet } from '../contexts/WalletContext';
 import { useAddress } from '../contexts/AddressContext';
 import { useNavigation } from '@react-navigation/native';
 import ROUTES from '../navigation/routes/Routes';
-import TouchableScale from '../components/TouchableScale';
 
 interface SubscriptionPlan {
   id: string;
@@ -50,14 +48,14 @@ interface Vehicle {
 const SubscriptionScreen = () => {
   const navigation = useNavigation<any>();
   const { balance } = useWallet();
+  const { addresses } = useAddress();
+
   const [duration, setDuration] = useState(3);
   const [selectedPlan, setSelectedPlan] = useState<string>('premium');
   const [selectedVehicle, setSelectedVehicle] = useState<string>('activa');
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
   const [showAddressModal, setShowAddressModal] = useState(false);
-
-  const { addresses } = useAddress();
   const [selectedAddress, setSelectedAddress] = useState<any>(null);
 
   useEffect(() => {
@@ -128,20 +126,13 @@ const SubscriptionScreen = () => {
   const calculatePrice = () => {
     const plan = plans.find(p => p.id === selectedPlan);
     const vehicle = vehicles.find(v => v.id === selectedVehicle);
-    if (!plan || !vehicle) return 0;
-
-    const basePrice = plan.monthlyPrice + vehicle.basePrice;
+    const basePrice = (plan?.monthlyPrice || 0) + (vehicle?.basePrice || 0);
     const discount = duration >= 6 ? 0.1 : duration >= 3 ? 0.05 : 0;
     const subtotal = basePrice * duration;
     const discountAmount = subtotal * discount;
     const total = subtotal - discountAmount;
 
-    return {
-      subtotal: subtotal || 0,
-      discountAmount: discountAmount || 0,
-      total: total || 0,
-      monthlyPrice: basePrice || 0
-    };
+    return { subtotal, discountAmount, total, monthlyPrice: basePrice };
   };
 
   const handleSubscribe = () => {
@@ -173,215 +164,273 @@ const SubscriptionScreen = () => {
   const pricing = calculatePrice();
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      {/* Premium Header */}
-      <View className="bg-white px-6 py-4 flex-row items-center justify-between border-b border-gray-50">
-        <View className="flex-row items-center">
-          <TouchableOpacity onPress={() => navigation.goBack()} className="mr-4 bg-gray-50 p-2 rounded-full">
-            <X size={20} color="black" />
-          </TouchableOpacity>
-          <View>
-            <Text className="text-lg font-black text-gray-900 tracking-tight">Monthly Subscription</Text>
-            <Text className="text-xs font-bold text-gray-400 uppercase tracking-widest">RBX Elite Plans</Text>
-          </View>
-        </View>
-        <TouchableOpacity className="bg-yellow-50 p-2.5 rounded-2xl">
-          <Phone size={18} color="#f59e0b" />
-        </TouchableOpacity>
-      </View>
-
-      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-        {/* Vehicle Preview Card */}
-        <View className="px-6 pt-6">
-          <View className="bg-gray-50 rounded-[40px] p-6 items-center border border-gray-100/50">
+    <SafeAreaView className="flex-1 bg-gray-50">
+      <ScrollView className="flex-1">
+        {/* Header */}
+        <View className="bg-white p-4 border-b border-gray-100">
+          <View className="flex-row items-center justify-between">
             <Image
-              source={vehicles.find(v => v.id === selectedVehicle)?.image}
-              className="w-full h-44"
+              source={require('../../assets/images/log.jpg')}
+              className="w-24 h-10"
               resizeMode="contain"
             />
-            <View className="bg-white/80 px-4 py-2 rounded-2xl border border-gray-100 shadow-sm mt-4">
-              <Text className="text-gray-900 font-black text-sm uppercase tracking-tighter">
-                {vehicles.find(v => v.id === selectedVehicle)?.name}
-              </Text>
-            </View>
+            <Text className="text-xs font-semibold text-gray-700">
+              Monthly Rental Subscription
+            </Text>
           </View>
         </View>
 
-        <View className="px-6 py-8">
-          {/* Section: Plans */}
-          <View className="flex-row justify-between items-end mb-6">
-            <View>
-              <Text className="text-2xl font-black text-gray-900 tracking-tighter">Elite Plans</Text>
-              <Text className="text-gray-400 font-bold text-sm">Pick the perfect package</Text>
-            </View>
-            <Tag size={20} color="#94a3b8" />
+        {/* Hero Image */}
+        <View className="relative">
+          <Image
+            source={vehicles.find(v => v.id === selectedVehicle)?.image}
+            className="w-full h-48"
+            resizeMode="cover"
+          />
+          <View className="absolute bottom-3 right-4 bg-yellow-400 px-3 py-2 rounded-lg flex-row items-center">
+            <Star size={16} color="black" fill="black" />
+            <Text className="ml-1 text-black font-bold text-xs">
+              DOORSTEP DELIVERY
+            </Text>
           </View>
+        </View>
 
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-8">
+        <View className="p-4">
+          {/* Title */}
+          <Text className="text-2xl font-bold text-center mb-2">
+            Start Your Subscription
+          </Text>
+          <Text className="text-gray-500 text-center mb-6">
+            Choose your plan and enjoy hassle-free riding
+          </Text>
+
+          {/* Subscription Plans */}
+          <Text className="text-lg font-bold mb-3">Choose Your Plan</Text>
+          <View className="flex-row gap-3 mb-6">
             {plans.map(plan => (
-              <TouchableScale
+              <TouchableOpacity
                 key={plan.id}
                 onPress={() => setSelectedPlan(plan.id)}
-                className={`mr-4 w-44 rounded-[32px] p-5 border-2 ${selectedPlan === plan.id
-                  ? 'border-yellow-400 bg-yellow-50/50'
-                  : 'border-gray-100 bg-white'
+                className={`flex-1 rounded-xl p-3 border-2 ${selectedPlan === plan.id
+                  ? 'border-yellow-400 bg-yellow-50'
+                  : 'border-gray-200 bg-white'
                   }`}
-                style={{
-                  elevation: selectedPlan === plan.id ? 10 : 0,
-                  shadowColor: '#facc15',
-                  shadowOpacity: 0.1,
-                  shadowRadius: 10
-                }}
               >
                 {plan.popular && (
-                  <View className="absolute -top-3 left-6 bg-black px-3 py-1 rounded-full">
-                    <Star size={10} color="white" fill="white" />
+                  <View className="absolute -top-2 right-2 bg-yellow-400 px-2 py-1 rounded-full">
+                    <Text className="text-xs font-bold text-black">
+                      POPULAR
+                    </Text>
                   </View>
                 )}
-                <Text className="font-black text-gray-900 text-lg mb-1">{plan.name}</Text>
-                <View className="flex-row items-baseline">
-                  <Text className="text-2xl font-black text-gray-900">₹{plan.monthlyPrice}</Text>
-                  <Text className="text-[10px] font-black text-gray-400 ml-1 uppercase">/mo</Text>
-                </View>
+                <Text className="font-bold text-gray-900 mb-1">
+                  {plan.name}
+                </Text>
+                <Text className="text-xl font-bold text-gray-900">
+                  ₹{plan.monthlyPrice}
+                </Text>
+                <Text className="text-xs text-gray-500">/month</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
 
-                <View className="mt-4 pt-4 border-t border-gray-100/50">
-                  {plan.benefits.slice(0, 2).map((b, i) => (
-                    <View key={i} className="flex-row items-center mb-1.5">
-                      <View className="w-1.5 h-1.5 rounded-full bg-yellow-500 mr-2" />
-                      <Text className="text-[10px] font-bold text-gray-600" numberOfLines={1}>{b}</Text>
-                    </View>
-                  ))}
+          {/* Benefits */}
+          <View className="bg-white rounded-xl p-4 mb-6 border border-gray-100">
+            <Text className="font-bold mb-3 text-gray-900">
+              Plan Benefits
+            </Text>
+            {plans
+              .find(p => p.id === selectedPlan)
+              ?.benefits.map((benefit, index) => (
+                <View key={index} className="flex-row items-center mb-2">
+                  <Check size={16} color="#22c55e" />
+                  <Text className="ml-2 text-gray-700 text-sm">{benefit}</Text>
                 </View>
-              </TouchableScale>
+              ))}
+          </View>
+
+          {/* Vehicle Selection */}
+          <Text className="text-lg font-bold mb-3">Select Vehicle</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {vehicles.map(vehicle => (
+              <TouchableOpacity
+                key={vehicle.id}
+                onPress={() => setSelectedVehicle(vehicle.id)}
+                className={`mr-3 rounded-xl p-3 border-2 w-40 ${selectedVehicle === vehicle.id
+                  ? 'border-yellow-400 bg-yellow-50'
+                  : 'border-gray-200 bg-white'
+                  }`}
+              >
+                <Image
+                  source={vehicle.image}
+                  className="w-full h-20 mb-2"
+                  resizeMode="contain"
+                />
+                <Text className="font-semibold text-gray-900 text-sm">
+                  {vehicle.name}
+                </Text>
+                {vehicle.basePrice > 0 && (
+                  <Text className="text-xs text-gray-500">
+                    +₹{vehicle.basePrice}/mo
+                  </Text>
+                )}
+              </TouchableOpacity>
             ))}
           </ScrollView>
 
-          {/* Section: Vehicle Scroll */}
-          <View className="mb-8">
-            <Text className="text-sm font-black text-gray-400 uppercase tracking-[3px] mb-4 ml-1">Swap Vehicle</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {vehicles.map(v => (
-                <TouchableOpacity
-                  key={v.id}
-                  onPress={() => setSelectedVehicle(v.id)}
-                  className={`mr-3 rounded-[24px] px-5 py-3 border-2 flex-row items-center ${selectedVehicle === v.id ? 'border-yellow-400 bg-yellow-400' : 'border-gray-50 bg-gray-50'}`}
-                >
-                  <Image source={v.image} className="w-10 h-8 mr-3" resizeMode="contain" />
-                  <Text className={`font-black text-sm ${selectedVehicle === v.id ? 'text-black' : 'text-gray-400'}`}>{v.name.split(' ')[0]}</Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
+          {/* Date & Time */}
+          <Text className="text-lg font-bold mb-3 mt-6">
+            Delivery Schedule
+          </Text>
+          <View className="flex-row gap-3 mb-6">
+            <TouchableOpacity
+              onPress={() => setSelectedDate('2025-12-10')}
+              className="flex-1 flex-row items-center bg-white border border-gray-200 rounded-xl px-3 py-3"
+            >
+              <Calendar size={18} color="gray" />
+              <Text className="ml-2 font-medium text-gray-700">
+                {selectedDate || 'Select Date'}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => setSelectedTime('10:00 AM')}
+              className="flex-1 flex-row items-center bg-white border border-gray-200 rounded-xl px-3 py-3"
+            >
+              <Clock size={18} color="gray" />
+              <Text className="ml-2 font-medium text-gray-700">
+                {selectedTime || 'Select Time'}
+              </Text>
+            </TouchableOpacity>
           </View>
 
-          {/* Section: Duration */}
-          <View className="bg-gray-50 rounded-[32px] p-6 mb-8 border border-gray-100">
-            <View className="flex-row justify-between items-center mb-4">
-              <Text className="text-sm font-black text-black uppercase tracking-widest">Rental Tenure</Text>
-              <View className="bg-black px-3 py-1 rounded-full">
-                <Text className="text-white font-black text-[10px]">{duration} MONTHS</Text>
-              </View>
+          {/* Duration Slider */}
+          <Text className="text-lg font-bold mb-3">Subscription Duration</Text>
+          <View className="bg-white border border-gray-200 rounded-xl p-4 mb-6">
+            <View className="flex-row justify-between items-center mb-2">
+              <Text className="text-2xl font-bold text-gray-900">
+                {duration} {duration === 1 ? 'month' : 'months'}
+              </Text>
+              {duration >= 3 && (
+                <View className="bg-green-100 px-2 py-1 rounded-lg">
+                  <Text className="text-green-700 font-bold text-xs">
+                    {duration >= 6 ? '10% OFF' : '5% OFF'}
+                  </Text>
+                </View>
+              )}
             </View>
-
             <Slider
               style={{ width: '100%', height: 40 }}
               minimumValue={1}
               maximumValue={12}
               step={1}
               value={duration}
-              minimumTrackTintColor="#000"
+              minimumTrackTintColor="#facc15"
               maximumTrackTintColor="#e5e7eb"
-              thumbTintColor="#facc15"
-              onValueChange={v => setDuration(v)}
+              thumbTintColor="#fbbf24"
+              onValueChange={value => setDuration(value)}
             />
-
-            <View className="flex-row justify-between mt-2 px-1">
-              <Text className="text-[10px] font-black text-gray-400">1 MO</Text>
-              <Text className="text-[10px] font-black text-gray-400">12 MO</Text>
+            <View className="flex-row justify-between">
+              <Text className="text-xs text-gray-500">1 month</Text>
+              <Text className="text-xs text-gray-500">12 months</Text>
             </View>
-
-            {duration >= 3 && (
-              <View className="absolute -top-3 right-6 bg-green-500 px-3 py-1 rounded-full">
-                <Text className="text-white font-black text-[10px] tracking-tighter">
-                  SAVING {duration >= 6 ? '10%' : '5%'} EXTRA
-                </Text>
-              </View>
-            )}
           </View>
 
-          {/* Section: Schedule & Address */}
-          <View className="flex-row gap-4 mb-8">
-            <TouchableOpacity
-              onPress={() => setSelectedDate('2025-12-10')}
-              className="flex-1 bg-white border border-gray-100 rounded-3xl p-4 shadow-sm"
-            >
-              <Calendar size={18} color="#fbbf24" strokeWidth={3} />
-              <Text className="text-[10px] font-black text-gray-400 uppercase mt-2">Delivery Date</Text>
-              <Text className="text-sm font-black text-gray-900 mt-0.5">{selectedDate || 'Select'}</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => setSelectedTime('10:00 AM')}
-              className="flex-1 bg-white border border-gray-100 rounded-3xl p-4 shadow-sm"
-            >
-              <Clock size={18} color="#fbbf24" strokeWidth={3} />
-              <Text className="text-[10px] font-black text-gray-400 uppercase mt-2">Preferred Slot</Text>
-              <Text className="text-sm font-black text-gray-900 mt-0.5">{selectedTime || 'Select'}</Text>
-            </TouchableOpacity>
-          </View>
-
+          {/* Delivery Address */}
+          <Text className="text-lg font-bold mb-3">Delivery Address</Text>
           <TouchableOpacity
             onPress={() => setShowAddressModal(true)}
-            className="bg-white border border-gray-100 rounded-[32px] p-5 mb-10 flex-row items-center justify-between shadow-sm"
+            className="bg-white border border-gray-200 rounded-xl p-4 mb-6 flex-row items-center justify-between"
           >
             <View className="flex-row items-center flex-1">
-              <View className="bg-gray-50 p-3 rounded-2xl mr-4">
-                <MapPin size={22} color="#000" strokeWidth={2.5} />
-              </View>
-              <View className="flex-1">
-                <Text className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Delivery at</Text>
-                <Text className="font-black text-gray-900 text-base" numberOfLines={1}>
-                  {selectedAddress?.label || 'Choose delivery location'}
+              <MapPin size={20} color="#6b7280" />
+              <View className="ml-3 flex-1">
+                <Text className="font-semibold text-gray-900">
+                  {selectedAddress?.label || 'Select Address'}
                 </Text>
                 {selectedAddress && (
-                  <Text className="text-[10px] font-bold text-gray-400" numberOfLines={1}>
+                  <Text className="text-sm text-gray-500" numberOfLines={1}>
                     {selectedAddress.line1}, {selectedAddress.city}
                   </Text>
                 )}
               </View>
             </View>
-            <ChevronRight size={20} color="#94a3b8" />
+            <ChevronRight size={20} color="#9ca3af" />
           </TouchableOpacity>
 
-          {/* Checkout Summery */}
-          <View className="bg-black rounded-[40px] p-8 mb-10 shadow-2xl shadow-black/30">
-            <View className="flex-row justify-between items-center mb-6">
-              <Text className="text-white/50 font-black text-xs uppercase tracking-[4px]">Investment Breakdown</Text>
-              <Wallet size={20} color="#fff" />
+          {/* Wallet Balance */}
+          <View className="bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-xl p-4 mb-6 flex-row items-center justify-between">
+            <View className="flex-row items-center">
+              <Wallet size={24} color="black" />
+              <View className="ml-3">
+                <Text className="text-xs text-gray-800">Wallet Balance</Text>
+                <Text className="text-xl font-bold text-black">
+                  ₹{balance.toFixed(0)}
+                </Text>
+              </View>
             </View>
+            <TouchableOpacity
+              onPress={() => navigation.navigate(ROUTES.ADD_MONEY)}
+              className="bg-black px-4 py-2 rounded-lg"
+            >
+              <Text className="text-white font-bold text-sm">Add Money</Text>
+            </TouchableOpacity>
+          </View>
 
-            <View className="flex-row justify-between items-center mb-4">
-              <Text className="text-white text-base font-bold">Base Subscription</Text>
-              <Text className="text-white text-lg font-black">₹{pricing.subtotal.toFixed(0)}</Text>
+          {/* Price Breakdown */}
+          <View className="bg-white rounded-xl p-4 mb-6 border border-gray-200">
+            <Text className="font-bold mb-3 text-gray-900">
+              Price Breakdown
+            </Text>
+            <View className="flex-row justify-between mb-2">
+              <Text className="text-gray-600">
+                {duration} months × ₹{pricing.monthlyPrice}
+              </Text>
+              <Text className="font-semibold text-gray-900">
+                ₹{pricing.subtotal.toFixed(0)}
+              </Text>
             </View>
-
             {pricing.discountAmount > 0 && (
-              <View className="flex-row justify-between items-center mb-4">
-                <Text className="text-green-400 text-base font-bold">Loyalty Discount</Text>
-                <Text className="text-green-400 text-lg font-black">-₹{pricing.discountAmount.toFixed(0)}</Text>
+              <View className="flex-row justify-between mb-2">
+                <Text className="text-green-600">Discount</Text>
+                <Text className="font-semibold text-green-600">
+                  -₹{pricing.discountAmount.toFixed(0)}
+                </Text>
               </View>
             )}
-
-            <View className="pt-6 border-t border-white/10 mt-2 flex-row justify-between items-end">
-              <View>
-                <Text className="text-white/50 font-black text-[10px] uppercase mb-1">Total Payable</Text>
-                <Text className="text-white text-3xl font-black">₹{pricing.total.toFixed(0)}</Text>
+            <View className="border-t border-gray-200 pt-2 mt-2">
+              <View className="flex-row justify-between">
+                <Text className="font-bold text-lg text-gray-900">Total</Text>
+                <Text className="font-bold text-xl text-gray-900">
+                  ₹{pricing.total.toFixed(0)}
+                </Text>
               </View>
-              <TouchableScale
-                onPress={handleSubscribe}
-                className="bg-yellow-400 px-8 py-4 rounded-3xl"
-              >
-                <Text className="text-black font-black uppercase text-sm">Checkout</Text>
-              </TouchableScale>
+            </View>
+          </View>
+
+          {/* Subscribe Button */}
+          <TouchableOpacity
+            onPress={handleSubscribe}
+            className="bg-yellow-400 py-4 rounded-xl items-center shadow-lg"
+          >
+            <Text className="font-bold text-black text-lg">
+              Subscribe Now
+            </Text>
+          </TouchableOpacity>
+
+          {/* Trust Badges */}
+          <View className="flex-row justify-around mt-6 mb-4">
+            <View className="items-center">
+              <Shield size={24} color="#22c55e" />
+              <Text className="text-xs text-gray-600 mt-1">Insured</Text>
+            </View>
+            <View className="items-center">
+              <Wrench size={24} color="#3b82f6" />
+              <Text className="text-xs text-gray-600 mt-1">Maintained</Text>
+            </View>
+            <View className="items-center">
+              <Phone size={24} color="#f59e0b" />
+              <Text className="text-xs text-gray-600 mt-1">24/7 Support</Text>
             </View>
           </View>
         </View>
@@ -395,14 +444,14 @@ const SubscriptionScreen = () => {
         onRequestClose={() => setShowAddressModal(false)}
       >
         <View className="flex-1 bg-black/50 justify-end">
-          <View className="bg-white rounded-t-[40px] p-8 max-h-[75%]">
-            <View className="flex-row justify-between items-center mb-6">
-              <Text className="text-xl font-black text-gray-900 uppercase tracking-tighter">Select Address</Text>
-              <TouchableOpacity onPress={() => setShowAddressModal(false)} className="bg-gray-50 p-2 rounded-full">
-                <X size={18} color="black" />
+          <View className="bg-white rounded-t-3xl p-6 max-h-96">
+            <View className="flex-row justify-between items-center mb-4">
+              <Text className="text-xl font-bold">Select Address</Text>
+              <TouchableOpacity onPress={() => setShowAddressModal(false)}>
+                <X size={24} color="black" />
               </TouchableOpacity>
             </View>
-            <ScrollView showsVerticalScrollIndicator={false}>
+            <ScrollView>
               {addresses.map(address => (
                 <TouchableOpacity
                   key={address._id}
@@ -410,25 +459,26 @@ const SubscriptionScreen = () => {
                     setSelectedAddress(address);
                     setShowAddressModal(false);
                   }}
-                  className={`p-5 rounded-3xl mb-3 border-2 ${selectedAddress?._id === address._id ? 'border-yellow-400 bg-yellow-50' : 'border-gray-50 bg-gray-50'}`}
+                  className="bg-gray-50 p-4 rounded-xl mb-3 border border-gray-200"
                 >
-                  <Text className="font-black text-gray-900 text-base mb-1">
+                  <Text className="font-bold text-gray-900 mb-1">
                     {address.label}
                   </Text>
-                  <Text className="text-xs font-bold text-gray-400 leading-4" numberOfLines={2}>
-                    {address.line1}, {address.city}, {address.state} {address.pincode}
+                  <Text className="text-sm text-gray-600">
+                    {address.line1}, {address.city}, {address.state}{' '}
+                    {address.pincode}
                   </Text>
                 </TouchableOpacity>
               ))}
-              <TouchableScale
+              <TouchableOpacity
                 onPress={() => {
                   setShowAddressModal(false);
                   navigation.navigate(ROUTES.ADD_EDIT_ADDRESS);
                 }}
-                className="bg-black p-5 rounded-3xl items-center mt-4"
+                className="bg-yellow-400 p-4 rounded-xl items-center"
               >
-                <Text className="font-black text-white uppercase text-xs tracking-widest">Add New Address</Text>
-              </TouchableScale>
+                <Text className="font-bold text-black">Add New Address</Text>
+              </TouchableOpacity>
             </ScrollView>
           </View>
         </View>

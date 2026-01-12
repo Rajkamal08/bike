@@ -169,10 +169,10 @@ const HomeScreen = () => {
             </View>
             <TouchableScale
               onPress={handleSearch}
-              className="bg-yellow-400 rounded-3xl py-5 shadow-2xl shadow-yellow-200"
-              style={{ elevation: 12 }}
+              className="bg-yellow-400 rounded-2xl py-4.5 shadow-xl shadow-yellow-200"
+              style={{ elevation: 8 }}
             >
-              <Text className="text-center text-black font-black text-xl uppercase tracking-[2px]">
+              <Text className="text-center text-black font-black text-lg uppercase tracking-wider">
                 Find My Ride
               </Text>
             </TouchableScale>
