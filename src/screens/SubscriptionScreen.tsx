@@ -48,17 +48,22 @@ interface Vehicle {
 }
 
 const SubscriptionScreen = () => {
-  const navigation = useNavigation<any>();
-  const { balance } = useWallet();
-  const { addresses, defaultAddress } = useAddress();
-
   const [duration, setDuration] = useState(3);
   const [selectedPlan, setSelectedPlan] = useState<string>('premium');
   const [selectedVehicle, setSelectedVehicle] = useState<string>('activa');
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
   const [showAddressModal, setShowAddressModal] = useState(false);
-  const [selectedAddress, setSelectedAddress] = useState(defaultAddress);
+
+  const { addresses } = useAddress();
+  const [selectedAddress, setSelectedAddress] = useState<any>(null);
+
+  useEffect(() => {
+    if (addresses.length > 0 && !selectedAddress) {
+      const def = addresses.find(a => a.isDefault) || addresses[0];
+      setSelectedAddress(def);
+    }
+  }, [addresses]);
 
   const plans: SubscriptionPlan[] = [
     {
@@ -335,6 +340,11 @@ const SubscriptionScreen = () => {
                 <Text className="font-black text-gray-900 text-base" numberOfLines={1}>
                   {selectedAddress?.label || 'Choose delivery location'}
                 </Text>
+                {selectedAddress && (
+                  <Text className="text-[10px] font-bold text-gray-400" numberOfLines={1}>
+                    {selectedAddress.line1}, {selectedAddress.city}
+                  </Text>
+                )}
               </View>
             </View>
             <ChevronRight size={20} color="#94a3b8" />
@@ -375,72 +385,53 @@ const SubscriptionScreen = () => {
         </View>
       </ScrollView>
 
-      {/* Trust Badges */}
-      <View className="flex-row justify-around mt-6 mb-4">
-        <View className="items-center">
-          <Shield size={24} color="#22c55e" />
-          <Text className="text-xs text-gray-600 mt-1">Insured</Text>
-        </View>
-        <View className="items-center">
-          <Wrench size={24} color="#3b82f6" />
-          <Text className="text-xs text-gray-600 mt-1">Maintained</Text>
-        </View>
-        <View className="items-center">
-          <Phone size={24} color="#f59e0b" />
-          <Text className="text-xs text-gray-600 mt-1">24/7 Support</Text>
-        </View>
-      </View>
-    </View>
-      </ScrollView >
-
-  {/* Address Selection Modal */ }
-  < Modal
-visible = { showAddressModal }
-transparent
-animationType = "slide"
-onRequestClose = {() => setShowAddressModal(false)}
+      {/* Address Selection Modal */}
+      <Modal
+        visible={showAddressModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowAddressModal(false)}
       >
-  <View className="flex-1 bg-black/50 justify-end">
-    <View className="bg-white rounded-t-3xl p-6 max-h-96">
-      <View className="flex-row justify-between items-center mb-4">
-        <Text className="text-xl font-bold">Select Address</Text>
-        <TouchableOpacity onPress={() => setShowAddressModal(false)}>
-          <X size={24} color="black" />
-        </TouchableOpacity>
-      </View>
-      <ScrollView>
-        {addresses.map(address => (
-          <TouchableOpacity
-            key={address.id}
-            onPress={() => {
-              setSelectedAddress(address);
-              setShowAddressModal(false);
-            }}
-            className="bg-gray-50 p-4 rounded-xl mb-3 border border-gray-200"
-          >
-            <Text className="font-bold text-gray-900 mb-1">
-              {address.label}
-            </Text>
-            <Text className="text-sm text-gray-600">
-              {address.street}, {address.city}, {address.state}{' '}
-              {address.zipCode}
-            </Text>
-          </TouchableOpacity>
-        ))}
-        <TouchableOpacity
-          onPress={() => {
-            setShowAddressModal(false);
-            navigation.navigate(ROUTES.ADD_EDIT_ADDRESS);
-          }}
-          className="bg-yellow-400 p-4 rounded-xl items-center"
-        >
-          <Text className="font-bold text-black">Add New Address</Text>
-        </TouchableOpacity>
-      </ScrollView>
-    </View>
-  </View>
-      </Modal >
-    </SafeAreaView >
+        <View className="flex-1 bg-black/50 justify-end">
+          <View className="bg-white rounded-t-[40px] p-8 max-h-[75%]">
+            <View className="flex-row justify-between items-center mb-6">
+              <Text className="text-xl font-black text-gray-900 uppercase tracking-tighter">Select Address</Text>
+              <TouchableOpacity onPress={() => setShowAddressModal(false)} className="bg-gray-50 p-2 rounded-full">
+                <X size={18} color="black" />
+              </TouchableOpacity>
+            </View>
+            <ScrollView showsVerticalScrollIndicator={false}>
+              {addresses.map(address => (
+                <TouchableOpacity
+                  key={address._id}
+                  onPress={() => {
+                    setSelectedAddress(address);
+                    setShowAddressModal(false);
+                  }}
+                  className={`p-5 rounded-3xl mb-3 border-2 ${selectedAddress?._id === address._id ? 'border-yellow-400 bg-yellow-50' : 'border-gray-50 bg-gray-50'}`}
+                >
+                  <Text className="font-black text-gray-900 text-base mb-1">
+                    {address.label}
+                  </Text>
+                  <Text className="text-xs font-bold text-gray-400 leading-4" numberOfLines={2}>
+                    {address.line1}, {address.city}, {address.state} {address.pincode}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+              <TouchableScale
+                onPress={() => {
+                  setShowAddressModal(false);
+                  navigation.navigate(ROUTES.ADD_EDIT_ADDRESS);
+                }}
+                className="bg-black p-5 rounded-3xl items-center mt-4"
+              >
+                <Text className="font-black text-white uppercase text-xs tracking-widest">Add New Address</Text>
+              </TouchableScale>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+    </SafeAreaView>
   );
 };
 
