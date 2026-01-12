@@ -158,7 +158,10 @@ const PhoneNumberScreen = () => {
               }}
             >
               {loading ? (
-                <ActivityIndicator size="small" color="#000" />
+                <View className="flex-row items-center justify-center">
+                  <ActivityIndicator size="small" color="#000" />
+                  <Text className="text-black font-extrabold ml-3">Sending OTP...</Text>
+                </View>
               ) : (
                 <Text className="text-black text-center text-xl font-extrabold tracking-tight">
                   Get OTP

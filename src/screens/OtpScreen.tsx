@@ -15,6 +15,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { useAuth } from '../contexts/AuthContext';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
@@ -35,7 +36,7 @@ const OtpScreen = () => {
   const navigation = useNavigation<OtpScreenNavigationProp>();
   const inputRefs = useRef<(TextInput | null)[]>(new Array(6).fill(null));
   const [error, setError] = useState<string | null>(null);
-  const [countdown, setCountdown] = useState(60);
+  const [countdown, setCountdown] = useState(30);
   const [canResend, setCanResend] = useState(false);
   const [resending, setResending] = useState(false);
   const { verifyOtp, sendOtp } = useAuth();
@@ -80,7 +81,7 @@ const OtpScreen = () => {
 
   const handleResendOtp = async () => {
     setCanResend(false);
-    setCountdown(60);
+    setCountdown(30);
     setResending(true);
     setError(null);
 
@@ -212,16 +213,22 @@ const OtpScreen = () => {
               )}
             </TouchableOpacity>
 
-            {/* Resend Logic */}
-            <View className="items-center mb-10">
+            {/* Resend Logic - More Prominent */}
+            <View className="items-center mb-10 bg-gray-50/50 py-4 rounded-3xl border border-gray-100">
               {canResend ? (
-                <TouchableOpacity onPress={handleResendOtp} disabled={resending}>
-                  <Text className="text-blue-600 font-extrabold text-base">Resend OTP</Text>
-                </TouchableOpacity>
+                <View className="flex-row items-center">
+                  <Text className="text-gray-500 font-medium text-base mr-2">Didn't receive code?</Text>
+                  <TouchableOpacity onPress={handleResendOtp} disabled={resending}>
+                    <Text className="text-blue-600 font-black text-base underline uppercase tracking-wider">Resend OTP</Text>
+                  </TouchableOpacity>
+                </View>
               ) : (
-                <Text className="text-gray-400 font-medium text-base">
-                  Resend code in <Text className="text-gray-900 font-bold">{countdown}s</Text>
-                </Text>
+                <View className="flex-row items-center">
+                  <Ionicons name="time-outline" size={18} color="#94a3b8" className="mr-2" />
+                  <Text className="text-gray-400 font-medium text-base">
+                    Resend code in <Text className="text-gray-900 font-black">{countdown}s</Text>
+                  </Text>
+                </View>
               )}
             </View>
 
