@@ -129,19 +129,11 @@ const OtpScreen = () => {
           contentContainerStyle={{ flexGrow: 1 }}
           keyboardShouldPersistTaps="handled"
         >
-          {/* Top Banner Image - Reduced Height and Mirroring Login Page */}
-          <View style={{ height: height * 0.22 }} className="w-full relative">
-            <Image
-              source={require('../../assets/images/Bike_rentals.jpg')}
-              className="w-full h-full"
-              resizeMode="cover"
-            />
-          </View>
 
           {/* Content Container */}
-          <View className="flex-1 px-8 pt-8 pb-10">
+          <View className="flex-1 px-8 pt-20 pb-10">
             {/* Logo Section */}
-            <View className="items-center mb-8">
+            <View className="items-center mb-10">
               <Image
                 source={require('../../assets/images/app_logo.png')}
                 style={{ width: width * 0.3, height: width * 0.3 * 0.6 }}
