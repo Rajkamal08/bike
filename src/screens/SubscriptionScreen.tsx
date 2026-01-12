@@ -8,7 +8,7 @@ import {
   Modal,
   Alert,
 } from 'react-native';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   Calendar,
@@ -48,6 +48,8 @@ interface Vehicle {
 }
 
 const SubscriptionScreen = () => {
+  const navigation = useNavigation<any>();
+  const { balance } = useWallet();
   const [duration, setDuration] = useState(3);
   const [selectedPlan, setSelectedPlan] = useState<string>('premium');
   const [selectedVehicle, setSelectedVehicle] = useState<string>('activa');
