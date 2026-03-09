@@ -1,4 +1,4 @@
-# Royal Ride – Premium Full-Stack Mobility Platform 🛵
+# Royal Ride APP – Premium Full-Stack Mobility Platform 🛵
 
 **Royal Ride** is a high-performance, full-stack bike rental and subscription platform designed for a seamless, "premium-first" user experience. Developed using **React Native**, **Node.js**, and **MongoDB**, the platform bridges the gap between traditional daily rentals and modern, long-term vehicle subscriptions.
 
