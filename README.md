@@ -90,6 +90,6 @@ The backend handles:
 
 ## 👨‍💻 Author
 
-**Rajkamal**
+**Raj kamal**
 
 GitHub: https://github.com/Rajkamal08
